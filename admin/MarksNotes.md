@@ -10,7 +10,7 @@
   - All values 0-99 are included; no other values
 - Second column has sequences
   - String of varying length
-  - In 33 rows for which read_csv gets a NaN for the sequence
+  - 33 rows for which read_csv gets a NaN for the sequence
     - The first is at row 27494
     - Find all rows using pandas
       - Step 1: Create a dataframe from the file
