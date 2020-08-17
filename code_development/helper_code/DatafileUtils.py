@@ -2,6 +2,7 @@
 # The purpose of this module is to provide utilities that make
 # manipulating datafiles easier.
 import pandas as pd
+import numpy as np
 
 def describeDatafile(inFilename, fileType = 'csv'):
     '''
@@ -35,16 +36,42 @@ def describeDatafile(inFilename, fileType = 'csv'):
             - lettsInLine: A numpy array, the nth entry of which contains the
                 number of letters that are in the nth row of the file (int)
             - naFirstCol: list of the row numbers where the first column value is NA
-            - naSecCol: list of the row numbers where the second column value is NA 
+            - naSecCol: list of the row numbers where the second column value is NA
 
     '''
     outDict = {}
-    
+
     try:
-        df = pd.DataFrame.read_csv(inFilename, header=None, names = ["idx", "seq"])
+        df = pd.read_csv(inFilename, header=None, names = ["idx", "seq"])
     except:
         outDict["validFlag"] = False
-        return OutDict
-        
+        return outDict
+
+    #DF without NaN rows:
+    cleanDF = df[~df.seq.isna()]
+
+    #one ~very~ long string of all the letters in all the rows:
+    wholeStr = ''.join(cleanDF.seq.to_list())
+
+    #to get list of which letters appear in each set of 3,000,000 rows...
+    #break it up into batches, bc all at once, it's too long
+    batchSize = 3000000
+    #ERROR MESSAGE: name 'stepNum' is not defined (next row)
+    letters = np.unique(np.array(list(wholeStr[stepNum*batchSize:(stepNum+1)*batchSize])))
+    #to get the last few rows:
+    lettersLast = np.unique(np.array(list(wholeStr[(len(wholeStr)//stepSize)*stepSize:])))
+    #concatenate it all together:
+    allLetters = np.concatenate([letters, lettersLast])
+    #get the unique letters in the whole file:
+    uniqueLetters = np.unique(np.concatenate(allLetters))
+
     outDict["validFlag"] = True
-    
+    outDict["numRows"] = df.shape[0]
+    outDict["allLetters"] = uniqueLetters
+    return(outDict)
+
+if __name__ == "__main__":
+    print("Hello, World!")
+    inFilename = "/Users/Aidia/Documents/SummerResearch2020/NeuralNetData/test.csv"
+    outDict = describeDatafile(inFilename)
+    print(outDict)
