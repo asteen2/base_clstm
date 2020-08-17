@@ -55,7 +55,7 @@ def aa_mask_blstm(num_classes, num_letters, sequence_length, mask_length, embed_
     x = Input(shape=(sequence_length, num_letters))
     m = Input(shape=(mask_length, 1))
     conv = Conv1D(filters=320, kernel_size=26, padding="valid", activation="relu")(x)
-    pool = MaxPooling1D(pool_size=13, stride=13)(conv)
+    pool = MaxPooling1D(pool_size=13, strides=13)(conv)
     masked = Multiply()([pool, m])
     masking = Masking(mask_value=0)(masked)
     drop1 = Dropout(0.2)(masking)
