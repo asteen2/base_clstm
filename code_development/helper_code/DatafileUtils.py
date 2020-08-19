@@ -47,27 +47,54 @@ def describeDatafile(inFilename, fileType = 'csv'):
         outDict["validFlag"] = False
         return outDict
 
-    #DF without NaN rows:
+    # DF without NaN rows:
     cleanDF = df[~df.seq.isna()]
 
-    #one ~very~ long string of all the letters in all the rows:
+    # one ~very~ long string of all the letters in all the rows:
     wholeStr = ''.join(cleanDF.seq.to_list())
 
-    #to get list of which letters appear in each set of 3,000,000 rows...
-    #break it up into batches, bc all at once, it's too long
+    # to get list of which letters appear in each set of 3,000,000 rows...
+    # break it up into batches, bc all at once, it's too long
     batchSize = 3000000
-    #ERROR MESSAGE: name 'stepNum' is not defined (next row)
+    stepNum = 1
+    # ERROR MESSAGE: name 'stepNum' is not defined (next row)
     letters = np.unique(np.array(list(wholeStr[stepNum*batchSize:(stepNum+1)*batchSize])))
+        # letters = ['A' 'C' 'G 'R' 'S' 'T' 'Y']
     #to get the last few rows:
-    lettersLast = np.unique(np.array(list(wholeStr[(len(wholeStr)//stepSize)*stepSize:])))
-    #concatenate it all together:
-    allLetters = np.concatenate([letters, lettersLast])
-    #get the unique letters in the whole file:
-    uniqueLetters = np.unique(np.concatenate(allLetters))
+    #lettersLast = np.unique(np.array(list(wholeStr[(len(wholeStr)//stepSize)*stepSize:])))
+        # stepSize is unknown. is it supposed to be stepNum?
+        # this line is commented bc if stepSize is replaced with stepNum,
+            # lettersLast is an empty array []
+    # concatenate it all together:
+    #allLetters = np.concatenate([letters, lettersLast])
+        # this line is commented because lettersLast = [], and zero-dimensional
+            # arrays can't be concatenated
+    # get the unique letters in the whole file:
+    #uniqueLetters = np.unique(np.concatenate(allLetters))
+        # this line is commented because the allLetters line above is commented
+    #
+    lengths = cleanDF.seq.str.len()
+    # make array where the nth entry contains the number of letters that are in
+        # the nth row of the file (int)
+    #numLettsArray = []
+    #for ind in cleanDF.index:
+        #numLettsArray.append(len(ind["seq"]))
+    # these lines are commented because array.append is inefficient and doesn't
+        # work for integers -- find a different way
 
     outDict["validFlag"] = True
     outDict["numRows"] = df.shape[0]
-    outDict["allLetters"] = uniqueLetters
+    outDict["allLetters"] = letters
+        # it should be uniqueLetters instead of letters, but the uniqueLetters
+            # line is commented because lettersLast = [] (see above)
+    outDict["totalNumLetters"] = len(wholeStr)
+    outDict["avgLettsPerSeq"] = lengths.mean()
+    outDict["medLettsPerSeq"] = lengths.median()
+    outDict["maxLettsPerSeq"] = lengths.max()
+    outDict["minLettsPerSeq"] = lengths.min()
+    outDict["lettsInLine"] = "code needs to be written"
+    outDict["naFirstCol"] = "code needs to be written"
+    outDict["naSecCol"] = "code needs to be written"
     return(outDict)
 
 if __name__ == "__main__":
